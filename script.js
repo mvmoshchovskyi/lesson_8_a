@@ -220,17 +220,22 @@
 const ARRAY_USERS = 'ARRAY_USERS'
 let tempUser = {}
 let form1 = document.forms.form1
+const content = document.getElementById('content')
 
 form1.submit.onclick = ev => {
-  ev.preventDefault()
-  let person = {}
+  // ev.preventDefault()
+  let person = {...tempUser}
+  tempUser ={}
   for (let i = 0; i < form1.children.length; i++) {
     const Form1element = form1.children[i];
     if (Form1element.name && Form1element.type !== 'submit') {
       person[Form1element.name] = Form1element.value
     }
   }
-  person.id = new Date().getTime()
+  if(!person.id){
+     person.id = new Date().getTime()
+  }
+
   saveUser(person)
 }
 getDataUserFromLs()
@@ -255,13 +260,13 @@ function saveUser(user) {
 function getDataUserFromLs() {
   if(localStorage.hasOwnProperty(ARRAY_USERS)){
     const arrayUser = JSON.parse(localStorage.getItem(ARRAY_USERS))
-    for (const item of arrayUser) {
-console.log(item)
+    for (const user of arrayUser) {
+content.appendChild(createDivPerson(user))
     }
   }
 
 }
-function createPersonUser() {
+function createDivPerson(user) {
 const main = document.createElement('div');
 let flag = true
   for (const key in user) {
@@ -269,6 +274,7 @@ let flag = true
       const h3 = document.createElement('h3');
       h3.innerText = key + " : " + user[key]
       main.appendChild(h3)
+      flag = false
     }
     else {
       const p = document.createElement('p');
@@ -282,10 +288,10 @@ let flag = true
   b1.innerText =" EDIT"
 b1.innerText =" DELETE"
   b1.onclick= function () {
-console.log(user.id)
+editUser(user.id)
   }
   b2.onclick= function () {
-console.log(user.id)
+deleteUser(user.id)
   }
 
 
@@ -294,9 +300,28 @@ console.log(user.id)
   return main
 }
 
+function deleteUser(id) {
+const parse = JSON.parse(localStorage.getItem(ARRAY_USERS))
+  const filter = parse.filter(user => user.id !==id)
+  localStorage.setItem(ARRAY_USERS, JSON.stringify(filter))
+  location.reload()
+}
 
-
-
+function editUser(id) {
+const parse = JSON.parse(localStorage.getItem(ARRAY_USERS))
+  const filter = parse.find(user => user.id ===id)
+  for (let i = 0; i < form1.children.length; i++) {
+    const Form1element = form1.children[i];
+    if (Form1element.name && Form1element.type !== 'submit') {
+      for (const key in user){
+        if(formElement.name === key){
+          formElement.value=user[key]
+        }
+      }
+    }
+  }
+  tempUser = user
+}
 
 
 
